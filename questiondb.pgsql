@@ -39,7 +39,7 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.answerkey (
-    "questionId" bigint NOT NULL,
+    questionid bigint NOT NULL,
     questionkey "char" NOT NULL,
     keytext character varying NOT NULL,
     isvalid boolean NOT NULL
@@ -106,22 +106,48 @@ ALTER TABLE public."user" OWNER TO postgres;
 --
 
 CREATE TABLE public.userrecord (
-    username character varying(20) NOT NULL,
+    username character varying(50) NOT NULL,
     testid bigint NOT NULL,
     questionid bigint NOT NULL,
-    keysequence "char"[] NOT NULL,
     date date NOT NULL,
-    locked boolean NOT NULL
+    locked boolean NOT NULL,
+    keysequence character varying NOT NULL
 );
 
 
 ALTER TABLE public.userrecord OWNER TO postgres;
 
 --
+-- Name: usertest; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.usertest (
+    username character varying(100) NOT NULL,
+    testid bigint NOT NULL,
+    attemptno bigint NOT NULL,
+    attemptedon date NOT NULL,
+    score bigint NOT NULL,
+    percent numeric NOT NULL,
+    starttime time with time zone NOT NULL,
+    endtime time with time zone
+);
+
+
+ALTER TABLE public.usertest OWNER TO postgres;
+
+--
 -- Data for Name: answerkey; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.answerkey ("questionId", questionkey, keytext, isvalid) FROM stdin;
+COPY public.answerkey (questionid, questionkey, keytext, isvalid) FROM stdin;
+1	a	This is optiona	t
+1	b	This is option b	f
+1	c	This is option c	f
+1	d	This is option D	t
+2	a	Question 2 Otion 1	f
+2	b	Question 2 option 2	t
+2	c	Option 3 of Question 2	f
+2	d	Forth otion of Q2	f
 \.
 
 
@@ -130,6 +156,8 @@ COPY public.answerkey ("questionId", questionkey, keytext, isvalid) FROM stdin;
 --
 
 COPY public.questionbank (questionid, qtext) FROM stdin;
+1	Question 1 asks yu to solve a difficut case of scenarios. Choose all correct options from the isted choices below.
+2	Question 2 Difficuty eve is enormous. Choose all statements which are true from teh choices provided.
 \.
 
 
@@ -138,6 +166,11 @@ COPY public.questionbank (questionid, qtext) FROM stdin;
 --
 
 COPY public.test (testid, testname, testdescription, questioncount, totalmarks) FROM stdin;
+1	SoftSkills-Presentation	To Test Presentation Skills of an Engineering Student	20	20
+2	OSExpertise	This Test asseses the operating system appreciation by a computer science sophomore	15	30
+3	CISCOCertification	A CISCO engineers requires Edge devices skill sets to be successfull in the field. A knwledge of components making up teh network will help with quick turnaround of issues.	20	50
+4	DataStructures	Can a candidate solve data representation and analysis chalenges? What are the performance considerations? How do we ensure data is consistent and durable?	15	20
+5	LanguageSkills-Java	Java being a very popular programming language for modern IT solutions, does the candidate possess enough understanding of encapsulating logical concerns around a modular solution?	25	25
 \.
 
 
@@ -178,7 +211,34 @@ Student46 KIIT	student46@gmail.com	1234554321	$2a$10$Mw0Nh1TW0yuKiN//GhWA.eOqBXe
 -- Data for Name: userrecord; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.userrecord (username, testid, questionid, keysequence, date, locked) FROM stdin;
+COPY public.userrecord (username, testid, questionid, date, locked, keysequence) FROM stdin;
+atulagrawal1901@gmail.com	1	1	2023-06-15	t	abc
+atulagrawal1901@gmail.com	1	2	2023-06-15	t	a
+student4@gmail.com	1	2	2023-06-15	t	a
+student4@gmail.com	1	1	2023-06-15	t	a
+student10@gmail.com	1	2	2023-06-15	t	a
+student10@gmail.com	1	1	2023-06-15	t	a
+student10@gmail.com	2	1	2023-06-15	t	a
+student10@gmail.com	3	1	2023-06-15	t	a
+student10@gmail.com	4	1	2023-06-15	t	a
+student10@gmail.com	5	1	2023-06-15	t	bc
+\.
+
+
+--
+-- Data for Name: usertest; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.usertest (username, testid, attemptno, attemptedon, score, percent, starttime, endtime) FROM stdin;
+atulagrawal1901@gmail.com	4	1	2023-05-03	0	0	19:21:01-07	\N
+atulagrawal1901@gmail.com	4	11	2023-05-03	0	0	19:26:01-07	\N
+atulagrawal1901@gmail.com	4	3	2023-05-03	0	0	19:27:30-07	\N
+atulagrawal1901@gmail.com	4	4	2023-05-03	0	0	19:55:37-07	\N
+atulagrawal1901@gmail.com	4	5	2023-05-03	0	0	19:59:18-07	\N
+atulagrawal1901@gmail.com	4	6	2023-06-14	0	0	20:01:05-07	\N
+atulagrawal1901@gmail.com	4	7	2023-06-14	0	0	20:04:45-07	\N
+student4@gmail.com	4	1	2023-06-14	0	0	20:05:57-07	\N
+student43@gmail.com	4	1	2023-06-14	0	0	20:18:50-07	\N
 \.
 
 
@@ -187,7 +247,7 @@ COPY public.userrecord (username, testid, questionid, keysequence, date, locked)
 --
 
 ALTER TABLE ONLY public.answerkey
-    ADD CONSTRAINT "QuestionBank_pkey" PRIMARY KEY ("questionId", questionkey);
+    ADD CONSTRAINT "QuestionBank_pkey" PRIMARY KEY (questionid, questionkey);
 
 
 --
@@ -215,6 +275,22 @@ ALTER TABLE ONLY public."user"
 
 
 --
+-- Name: userrecord userrecord_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.userrecord
+    ADD CONSTRAINT userrecord_pkey PRIMARY KEY (username, testid, questionid);
+
+
+--
+-- Name: usertest usertest_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usertest
+    ADD CONSTRAINT usertest_pkey PRIMARY KEY (username, testid, attemptno);
+
+
+--
 -- Name: email_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -226,6 +302,14 @@ CREATE UNIQUE INDEX email_idx ON public."user" USING btree (email) INCLUDE (emai
 --
 
 CREATE INDEX mobile_idx ON public."user" USING btree (mobileno);
+
+
+--
+-- Name: userrecord email; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.userrecord
+    ADD CONSTRAINT email FOREIGN KEY (username) REFERENCES public."user"(email) NOT VALID;
 
 
 --
