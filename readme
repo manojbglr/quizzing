@@ -1,0 +1,6 @@
+In order to import the tables into the pubic schema in teh postgres database use the following command from the bin directry of the postgres installation.
+
+psql -U username dbname < questions.pgsql
+
+This will import the tables and any data into teh postgress tables.
+
