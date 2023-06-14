@@ -1,6 +1,8 @@
-In order to import the tables into the pubic schema in teh postgres database use the following command from the bin directry of the postgres installation.
+#In order to import the tables into the pubic schema in the postgres database use the following command from the bin directry of the postgres installation.
+#Ensure the postgres database has a super user named postgres and the password for the same is postgres
+#It is assumed You have created a project named questionaire in the projects directory in C: drive. The below command shuld import the tables in postgres database
 
-psql -U username dbname < questions.pgsql
+psql -U postgres postgres < C:\projects\questionaire\questions.pgsql
 
-This will import the tables and any data into teh postgress tables.
+#This will import the tables and any data into teh postgress tables. If password is prompted provide the password as postgres
 
