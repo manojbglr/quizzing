@@ -1,6 +1,7 @@
 const Pool = require('pg').Pool
 const pg = require('pg');
 const encrypter = require('./passwordencrypt').hashPassword
+const validator = require('./passwordencrypt').checkPassword
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
@@ -18,22 +19,20 @@ const getUsers = (request, response) => {
   })
 }
 
-const getPasscode = (usr) => {
+async function validatePasscode(usr,passcode,callback) {
   const email = usr;
-  console.log("checking for email:"+usr)
+  //console.log("checking for email:"+usr)
   pool.query('SELECT password FROM public."user" WHERE email = $1', [email],(error, results) => {
     if (error) {
       console.log(error.message)
-      return
     }
-    
-    console.log("Result is "+results.rows);
-    return results.rows[0].password
-    
+    //console.log(results.rows[0].password)
+    callback(results.rows[0].password)
   })
 }
 
 const getUserByusername = (request, response) => {
+  
   const email = request.params.email
 
   pool.query('SELECT username,email,mobileno FROM public."user" WHERE email = $1', [email], (error, results) => {
@@ -318,7 +317,7 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
-  getPasscode,
+  validatePasscode,
   getTests,
   registerTest,
   getQuestiondtls,
