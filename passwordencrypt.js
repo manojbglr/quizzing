@@ -6,15 +6,15 @@ async function hashPassword(original_password){
     return hashedPass; //returns [object Promise]
 }
 
-async function checkPassword(submitted_password,dbpassword){
-bcrypt.compare(submitted_password, 10, function(err, res) {
-    if(submitted_password != dbpassword){
-      res.json({success: false, message: 'passwords do not match'});
-    } else {
-        res.json({success: true, message: 'passwords  matched'});
-      // invoke an catboy api and populate the success message
+async function checkPassword(submitted_password,dbpassword,callback){
+bcrypt.compare(submitted_password,dbpassword, function(err, res) {
+    if (err){
+      console.log("Exception matching password")  
     }
-  });}
+    callback(res)
+    })
+
+}
 
     module.exports = {
         hashPassword,
