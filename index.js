@@ -6,7 +6,7 @@ const express = require("express")
 const path = require('path')
 const app = express()
 
-const {getUsers, getUserByusername, createUser, getPasscode,getTests,registerTest,getQuestiondtls,registeranswer} = require('./queries.js');
+const {getUsers, getUserByusername, createUser, validatePasscode,getTests,registerTest,getQuestiondtls,registeranswer} = require('./queries.js');
 const { checkPassword } = require('./passwordencrypt.js');
 
 var PORT = process.env.port || 3000
@@ -115,14 +115,23 @@ app.post("/api/login", [
 	}
 	else{
 		const {email,passcode} = req.body
+		const passcheck = false;
+		validatePasscode(email,passcode,(dbpass)=>{
+		checkPassword(passcode,dbpass,(result)=>{
+			//console.log("Validation:"+result)
+			if (result){
+			res.status(200).send('{success:true,message:\"Vaidation Successfull\"}');
+			}
+			else{
+				res.status(200).send('{success:result,message:\"Validation Failed\"}');
+			}
+		})	
+		});
 		
-		const dbpassword = getPasscode(email);
-		console.log("Password from db "+dbpassword);
-	    checkPassword(passcode,dbpassword).then(response=>{
-		res.status(201).send(`${response}`);
-	})
-	}
-});
+	    
+	}}
+	
+);
 
 
 // get a list of  all available tests
